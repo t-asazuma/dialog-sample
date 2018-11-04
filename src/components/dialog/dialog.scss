@@ -1,0 +1,61 @@
+// 縦方向のマージンを指定しヘッダー幅を確保、横方向は自動として中央に
+.dialog {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.dialog-content {
+    position: absolute;
+    max-width: 70%;
+    z-index: 1200;
+    background: #fff;
+    border: 1px solid #000000;
+    border-radius: .3em;
+    opacity: 1;
+    padding: .3em;
+
+}
+
+// body全体を覆いopen時に透過率を指定してバックグラウンドカラーを表示する
+.dialog-mask {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    outline: 0;
+    overflow: hidden;
+    opacity: 0.3;
+    background: #000;
+}
+
+.dialog-content {
+    position: relative;
+    width: auto;
+}
+
+.dialog-header {
+    cursor: move;
+    border-radius: .3em;
+    border: 1px solid #000000;
+    background: #AAAAAA;
+    padding: .3em;
+    font-weight: bold;
+    opacity: 1;
+}
+
+.dialog-body {
+    padding: .3em;
+    overflow: auto;
+}
+
+.dialog-footer {
+    display: flex;
+    border: 1px solid #000000;
+    border-width: 1px 0 0 0;
+    padding: .3em;
+}
+
