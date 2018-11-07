@@ -16,7 +16,7 @@ class DialogHeader extends Component {
     render() {
         return(
             <DialogContext.Consumer>
-                {({mouseDownEvent, mouseUpEvent, mouseMoveEvent}) => 
+                {({mouseDownEvent, mouseUpEvent}) => 
                 {
                     return (
                     <div ref={dialogHeader => this.dialogHeader = dialogHeader}
