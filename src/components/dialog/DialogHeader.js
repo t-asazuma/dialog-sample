@@ -21,8 +21,7 @@ class DialogHeader extends Component {
                     return (
                     <div ref={dialogHeader => this.dialogHeader = dialogHeader}
                             className="dialog-header"
-                            onMouseDown={mouseDownEvent}
-                            onMouseUp={mouseUpEvent}>
+                            onMouseDown={mouseDownEvent}>
                         {this.props.children}
                     </div>
                 )}}

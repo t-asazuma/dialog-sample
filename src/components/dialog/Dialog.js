@@ -27,28 +27,11 @@ class Dialog extends Component {
             isDialogMoveMouseDown: true,
             offsetX: this.dialog.offsetLeft - event.clientX,
             offsetY: this.dialog.offsetTop - event.clientY,
-            style: {
-                width: 'auto',
-                height: 'auto'
-            }
         });
     }
 
     dialogMoveMouseUpEvent(event) {
         this.setState({isDialogMoveMouseDown: false});
-    }
-
-    dialogMoveMouseMoveEvent(event) {
-        if(!this.state.isDialogMoveMouseDown) {
-            return;
-        }
-
-        this.setState({
-            style: {
-                left: event.clientX + this.state.offsetX + 'px',
-                top: event.clientY + this.state.offsetY + 'px',
-            }
-        });
     }
 
     resizeRightBottomMouseDown(event) {
@@ -59,25 +42,61 @@ class Dialog extends Component {
         });
     }
 
-    resizeRightBottomMouseUp(event) {
+    mouseUpEvent(event) {
         console.log(event);
         this.setState({
+            isDialogMoveMouseDown: false,
             isResizeRight: false,
             isResizeBottom: false
         });
     }
 
+    mouseMoveEvent(event) {
+        this.dialogMove(event);
+        this.resize(event);
 
-    resizeMouseMove(event) {
-        const width = event.clientX - this.dialog.getBoundingClientRect().left;
-        const height = event.clientY - this.dialog.getBoundingClientRect().top;
+    }
+
+    dialogMove(event) {
+        if(!this.state.isDialogMoveMouseDown) {
+            return;
+        }
+
+        let newStyle = Object.assign({}, this.state.style, {
+            left: event.clientX + this.state.offsetX + 'px',
+            top: event.clientY + this.state.offsetY + 'px',
+        })
 
         this.setState({
-            style: {
-                width: width,
-                height: height
-            }
+            style: newStyle
+        });
+    }
+
+    resize(event) {
+        if(!this.state.isResizeRight && !this.state.isResizeBottom) {
+            return;
+        }
+
+        let width = this.dialog.clientWidth;
+        let height = this.dialog.clientHeight;
+
+        if(this.state.isResizeRight) {
+            width = event.clientX - this.dialog.getBoundingClientRect().left;
+        }
+
+        if(this.state.isResizeBottom) {
+            height = event.clientY - this.dialog.getBoundingClientRect().top;
+        }
+
+        let newStyle = Object.assign({}, this.state.style, {
+            width: width,
+            height: height
         })
+
+        this.setState({
+            style: newStyle
+        });
+
     }
 
     render() {
@@ -97,7 +116,8 @@ class Dialog extends Component {
                         style={{display: this.state.isOpen ? 'block': 'none'}}>
                 </div>
                 <div className="dialog-wrapper"
-                        onMouseMove={this.dialogMoveMouseMoveEvent.bind(this)}
+                        onMouseMove={this.mouseMoveEvent.bind(this)}
+                        onMouseUp={this.mouseUpEvent.bind(this)}
                         style={{display: this.state.isOpen ? 'block': 'none'}}>
                     <div className="dialog"
                             ref={dialog => this.dialog = dialog}
@@ -106,9 +126,7 @@ class Dialog extends Component {
                                 {children}
                             </div>
                             <div className="dialog-resize-area-right-bottom"
-                                onMouseDown={this.resizeRightBottomMouseDown.bind(this)}
-                                onMouseUp={this.resizeRightBottomMouseUp.bind(this)}
-                                onMouseMove={this.resizeMouseMove.bind(this)}/>
+                                onMouseDown={this.resizeRightBottomMouseDown.bind(this)}/>
                     </div>
                 </div>
             </DialogContext.Provider>
