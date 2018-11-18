@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 
 import DialogContext from './DialogContext'
+
 import './dialog.scss';
 
 class Dialog extends Component {
@@ -11,8 +12,10 @@ class Dialog extends Component {
             isOpen: false,
             isDialogMoveMouseDown: false,
             isResizeRight: false,
-            isResizeBottom: false
+            isResizeBottom: false,
+            bodyHeight: null
         }
+        this.components = {};
     }
 
     componentWillReceiveProps(props) {
@@ -20,9 +23,7 @@ class Dialog extends Component {
     }
 
     dialogMoveMouseDownEvent(event) {
-        console.log(this);
-
-
+        this.wrapper.style.zIndex = 1300;
         this.setState({
             isDialogMoveMouseDown: true,
             offsetX: this.dialog.offsetLeft - event.clientX,
@@ -35,15 +36,20 @@ class Dialog extends Component {
     }
 
     resizeRightBottomMouseDown(event) {
-        console.log(event);
+        this.wrapper.style.zIndex = 1300;
+        const expectBodyHeight = this.dialogContent.clientHeight - this.components.body.offsetHeight;
+        const offset = this.dialog.clientHeight - this.dialogContent.clientHeight;
+
         this.setState({
             isResizeRight: true,
-            isResizeBottom: true
+            isResizeBottom: true,
+            expectBodyHeight: expectBodyHeight,
+            offset: offset
         });
     }
 
     mouseUpEvent(event) {
-        console.log(event);
+        this.wrapper.style.zIndex = 1;
         this.setState({
             isDialogMoveMouseDown: false,
             isResizeRight: false,
@@ -54,7 +60,6 @@ class Dialog extends Component {
     mouseMoveEvent(event) {
         this.dialogMove(event);
         this.resize(event);
-
     }
 
     dialogMove(event) {
@@ -77,6 +82,7 @@ class Dialog extends Component {
             return;
         }
 
+
         let width = this.dialog.clientWidth;
         let height = this.dialog.clientHeight;
 
@@ -88,15 +94,22 @@ class Dialog extends Component {
             height = event.clientY - this.dialog.getBoundingClientRect().top;
         }
 
+        const bodyHeight = height - this.state.offset - this.state.expectBodyHeight
+
         let newStyle = Object.assign({}, this.state.style, {
             width: width,
             height: height
         })
 
         this.setState({
-            style: newStyle
+            style: newStyle,
+            bodyHeight: bodyHeight
         });
 
+    }
+
+    setComponent(name, component) {
+        this.components[name] = component;
     }
 
     render() {
@@ -104,6 +117,8 @@ class Dialog extends Component {
         const context = {
             mouseDownEvent: this.dialogMoveMouseDownEvent.bind(this),
             mouseUpEvent: this.dialogMoveMouseUpEvent.bind(this),
+            setComponent: this.setComponent.bind(this),
+            bodyHeight: this.state.bodyHeight
         }
 
         const mergeStyle = Object.assign({}, style, {
@@ -115,19 +130,22 @@ class Dialog extends Component {
                 <div className='dialog-mask' 
                         style={{display: this.state.isOpen ? 'block': 'none'}}>
                 </div>
-                <div className="dialog-wrapper"
+                <div ref={wrapper => this.wrapper = wrapper}
+                        className="dialog-wrapper"
                         onMouseMove={this.mouseMoveEvent.bind(this)}
                         onMouseUp={this.mouseUpEvent.bind(this)}
                         style={{display: this.state.isOpen ? 'block': 'none'}}>
-                    <div className="dialog"
-                            ref={dialog => this.dialog = dialog}
-                            style={mergeStyle}>
-                            <div className="dialog-content">
-                                {children}
-                            </div>
-                            <div className="dialog-resize-area-right-bottom"
-                                onMouseDown={this.resizeRightBottomMouseDown.bind(this)}/>
+                </div>
+                <div className="dialog"
+                        ref={dialog => this.dialog = dialog}
+                        style={mergeStyle}>
+                    <div className="dialog-content"
+                            ref={dialogContent => this.dialogContent = dialogContent }>
+
+                        {children}
                     </div>
+                    <div className="dialog-resize-area-right-bottom"
+                        onMouseDown={this.resizeRightBottomMouseDown.bind(this)}/>
                 </div>
             </DialogContext.Provider>
     )
@@ -139,4 +157,3 @@ Dialog.propTypes = {
 }
 
 export default Dialog;
-export { DialogContext };

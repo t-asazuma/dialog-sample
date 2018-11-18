@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import DialogContext from './DialogContext';
+import withDialog from './withDialog';
 
 import './dialog.scss';
 
@@ -13,21 +13,19 @@ class DialogHeader extends Component {
         }
     }
 
+    componentDidUpdate() {
+        this.props.context.setComponent('header', this.dialogHeader);
+    }
+
     render() {
         return(
-            <DialogContext.Consumer>
-                {({mouseDownEvent, mouseUpEvent}) => 
-                {
-                    return (
-                    <div ref={dialogHeader => this.dialogHeader = dialogHeader}
-                            className="dialog-header"
-                            onMouseDown={mouseDownEvent}>
-                        {this.props.children}
-                    </div>
-                )}}
-            </DialogContext.Consumer>
+            <div ref={dialogHeader => this.dialogHeader = dialogHeader}
+                    className="dialog-header"
+                    onMouseDown={this.props.context.mouseDownEvent}>
+                {this.props.children}
+            </div>
         )
     }
 }
 
-export default DialogHeader;
+export default withDialog(DialogHeader);
